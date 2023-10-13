@@ -222,7 +222,8 @@ class CodeWindow(VGroup):
 
 	def unwrite_words(self, line_number : int, word_numbers : List[int]):
 		return [Unwrite(self.paragraph.submobjects[line_number].submobjects[i]) for i in word_numbers]
-	
+
+# this code is currently broken
 class CodeMarker(RoundedRectangle):
 	# MARKER TO SHOW WHERE WE ARE UP TO IN THE CODE
 	def __init__(self, paragraph : Paragraph, line_number : int):
