@@ -123,6 +123,5 @@ class TestCode(ThreeDScene):
 		self.play(mainSF.animate.shift(OUT))
 
 		self.move_camera(phi=0*DEGREES, theta=-90*DEGREES, focal_distance=40)
-
 		
 

@@ -14,7 +14,7 @@ CODE_MARKER_PAD: float = 0.3
 
 # COLORS
 CODE_WINDOW_BG_FILL_COLOR : str = "#1e1e2e"
-CODE_WINDOW_BG_FILL_OPACITY : float = 1
+CODE_WINDOW_BG_FILL_OPACITY : float = 0.5 
 
 # SYNTAX COLORS
 KWD : str = "#b4befe" # keyword

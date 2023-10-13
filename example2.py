@@ -46,21 +46,35 @@ class TestCode(ThreeDScene):
         addFinal = addGen1.apply_color(addCol).generate([[], [], [], []])
 
         mainWindow = CodeWindow(mainPreReturn)
-        addWindow = CodeWindow(addFinal)
+        mainWindow.add(mainPostReturn)
+        addWindow = CodeWindow(addFinal) # wtf i have to fix this
+
 
         # BEGIN ANIMATIONS
-        self.play(Write(mainWindow))
+        self.play(Write(mainWindow.window), Write(mainWindow.paragraph))
         self.move_camera(phi=60*DEGREES, theta=-135*DEGREES, focal_distance=40)
 
+        #another marker
+        theMarker = CodeMarker(mainPreReturn, 0)
+        mcp1 = CodeMarker(mainPreReturn, 1)
+        mcp2 = CodeMarker(mainPreReturn, 2)
+        mcp3 = CodeMarker(mainPostReturn, 2)
+        mcp4 = CodeMarker(mainPostReturn, 3)
+
+        self.play(Write(theMarker))
+        theMarker.transform_marker(self, mcp1)
+        theMarker.transform_marker(self, mcp2)
+
         # create add code frame
+        mainPostReturn.set_opacity(0)
         self.play(mainWindow.animate.shift(IN))
-        mainPostReturn.shift(IN)
+        self.remove(mainPostReturn)
+        mainPostReturn.set_opacity(1)
+
 
         # hide the called function in the function call
-
         self.play(FadeOut(addWindow.window), run_time = 0)
         self.add(addWindow.window)
-
         self.play(Transform(addPreCall, mainPreReturn.submobjects[2].submobjects[4]), run_time=0)
         self.add(addPreCall)
         self.play(FadeIn(addWindow.window), Transform(addPreCall, addFinal))
@@ -73,7 +87,12 @@ class TestCode(ThreeDScene):
         
         # transform return value
         self.play(*mainWindow.unwrite_words(2, [5,6,7,8,9]))
-        self.play(Transform(mainPreReturn, mainPostReturn))
+        self.play(Unwrite(theMarker))
+        self.play(ReplacementTransform(mainPreReturn, mainPostReturn))
+        self.play(Create(theMarker))
+        theMarker.transform_marker(self, mcp3)
+        theMarker.transform_marker(self, mcp4)
+
         self.play(mainWindow.animate.shift(OUT))
         
         self.move_camera(phi=0*DEGREES, theta=-90*DEGREES, focal_distance=40)

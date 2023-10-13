@@ -82,3 +82,6 @@ self.play(Transform(main1, main5))
 # the lower stack frame rises to fill the void
 self.play(mainSF.animate.shift(OUT))
 ```
+
+**Only do transformations at z = 0**
+I tend to lose track of where all the invisible elements are so i just keep them at z = 0
