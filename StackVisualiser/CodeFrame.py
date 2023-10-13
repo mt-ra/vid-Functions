@@ -153,6 +153,14 @@ class CodeBlock:
 			line.apply_color(colList)
 		return self
 
+		#assert len(colMatrix) == self.num_lines
+
+		for i in range(len(self.lines)):
+			line = self.lines[i]
+			colList = colMatrix[i]
+			line.apply_color(colList)
+		return self
+
 	def generate(self, word_varnums: List[List[int]]):
 		assert len(word_varnums) == self.num_lines
 
