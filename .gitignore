@@ -1,0 +1,35 @@
+# Virtual environment
+venv/
+
+# Standard libraries
+lib/
+lib64/
+share/
+bin/
+
+# Compiled python files
+__pycache__/
+
+# Local settings
+.env
+.envrc
+.vscode/
+
+# Dependency directories
+.venv/
+venv/
+.tox/
+
+# Distribution directories
+build/
+dist/
+
+# OS or editor temporary files
+.DS_Store
+*.swp
+*.bak
+*.pyc
+*.log
+
+# Manim render results
+media/
