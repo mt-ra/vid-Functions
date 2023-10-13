@@ -1,128 +1,79 @@
 from manim import *
-
 from StackVisualiser.CodeFrame import *
 
 class TestCode(ThreeDScene):
-	def construct(self):
-		mainGen1 = CodeBlock([]).from_list([
-			['#include ', '<iostream>'],
-			[],
-			['int ', 'main', '()', '{'],
-			['    ', ('', 'std::'), 'cout ', '<< ', '"Hello World!\\n"', ';'],
-			['    ', ('', 'std::'), 'cout ', '<< ', ('add', ''), ('(', ''), ('2', ''), (', ', ''), ('3', '5'), (')', ''), ';'],
-			['}']
-		]).apply_color([
-			[KWD, NUM],
-			[VAR],
-			[KWD, FUNC, BRA, BRA],
-			[VAR, CLS, VAR, OPER, STR, VAR],
-			[VAR, CLS, VAR, OPER, FUNC, BRA, NUM, VAR, NUM, BRA, VAR],
-			[BRA]
-		])
+    def construct(self):
+        mainGen1 = CodeBlock([]).from_list([
+            ['int ', 'x ', '= ', '6', ';'],
+            ['int ', 'y ', '= ', '9', ';'],
+            ['std', '::', 'cout ', '<< ', ('swap', '420'), ('(', ''), ('x', ''), (', ', ''), ('y', ''), (')', ''), ';'],
+            ['std', '::', 'cout ', '<< ', 'x ', '<< ', 'y', ';']
+        ])
+        mainPreReturnCol = [
+            [KWD, VAR, OPER, NUM, VAR],
+            [KWD, VAR, OPER, NUM, VAR],
+            [CLS, OPER, VAR, OPER, FUNC, BRA, VAR, OPER, VAR, BRA, VAR],
+            [CLS, OPER, VAR, OPER, VAR, OPER, VAR, VAR]
+        ]
 
-		mainGen2 = CodeBlock([]).from_list([
-			['#include ', '<iostream>'],
-			['using namespace ', 'std', ';'],
-			[''],
-			['int ', 'main', '()', '{'],
-			['    ', ('', 'std::'), 'cout ', '<< ', '"Hello World!\\n"', ';'],
-			['    ', ('', 'std::'), 'cout ', '<< ', ('add', ''), ('(', ''), ('2', ''), (', ', ''), ('3', '5'), (')', ''), ';'],
-			['}']
-		]).apply_color([
-			[KWD, NUM],
-			[KWD, CLS, VAR],
-			[VAR],
-			[KWD, FUNC, BRA, BRA],
-			[VAR, CLS, VAR, OPER, STR, VAR],
-			[VAR, CLS, VAR, OPER, FUNC, BRA, NUM, VAR, NUM, BRA, VAR],
-			[BRA]
-		])
+        mainPostReturnCol = [
+            [KWD, VAR, OPER, NUM, VAR],
+            [KWD, VAR, OPER, NUM, VAR],
+            [CLS, OPER, VAR, OPER, NUM, BRA, VAR, OPER, VAR, BRA, VAR],
+            [CLS, OPER, VAR, OPER, VAR, OPER, VAR, VAR]
+        ]
+        
+        # remember to unwrite before transforming
 
-		mainGen3 = CodeBlock([]).from_list([
-			['#include ', '<iostream>'],
-			['using namespace ', 'std', ';'],
-			[''],
-			['int ', 'main', '()', '{'],
-			['    ', ('', 'std::'), 'cout ', '<< ', '"Hello World!\\n"', ';'],
-			['    ', ('', 'std::'), 'cout ', '<< ', ('add', ''), ('(', ''), ('2', ''), (', ', ''), ('3', '5'), (')', ''), ';'],
-			['}']
-		]).apply_color([
-			[KWD, NUM],
-			[KWD, CLS, VAR],
-			[VAR],
-			[KWD, FUNC, BRA, BRA],
-			[VAR, CLS, VAR, OPER, STR, VAR],
-			[VAR, CLS, VAR, OPER, FUNC, BRA, NUM, VAR, NUM, BRA, VAR],
-			[BRA]
-		])
+        addGen1 = CodeBlock([]).from_list([
+            ['int ', 'temp ', '= ', 'y'],
+            ['y ', '= ', 'x', ';'],
+            ['x ', '= ', 'temp', ';'],
+            ['return ', '420', ';']
+        ])
+        
+        addCol = [
+            [KWD, VAR, OPER, VAR],
+            [VAR, OPER, VAR, VAR],
+            [VAR, OPER, VAR, VAR],
+            [KWD, NUM, VAR]
+        ]
+        
+        mainPreReturn = mainGen1.apply_color(mainPreReturnCol).generate([[], [], [0, 0, 0, 0, 0, 0], []])
+        mainPostReturn = mainGen1.apply_color(mainPostReturnCol).generate([[], [], [1, 1, 1, 1, 1, 1], []])
 
-		addGen1 = CodeBlock([]).from_list([
-			['int ', 'add', '(', 'int ', 'a, ', 'int ', 'b', ') ', '{'],
-			['    ', '// ', ('', 'a = 2; b = 3;')],
-			['    ', 'return ', 'a ', '+ ', 'b', ';'],
-			['}']
-		]).apply_color([
-			[KWD, FUNC, BRA, KWD, VAR, KWD, VAR, BRA, BRA],
-			[VAR, COM, COM],
-			[VAR, KWD, VAR, OPER, VAR, VAR],
-			[BRA]
-		])
+        addPreCall = addGen1.apply_color(addCol).generate([[], [], [], []])
+        addFinal = addGen1.apply_color(addCol).generate([[], [], [], []])
 
-		main1 = mainGen1.generate([[], [], [], [1], [1, 0, 0, 0, 0, 0, 0], []])
-		main2 = mainGen1.generate([[], [], [], [0], [0, 0, 0, 0, 0, 0, 0], []])
-		main3 = mainGen2.generate([[], [], [], [], [0], [0, 0, 0, 0, 0, 0, 0], []])
-		main4 = mainGen3.generate([[], [], [], [], [0], [0, 0, 0, 0, 0, 0, 0], []])
-		main5 = mainGen3.generate([[], [], [], [], [0], [0, 1, 1, 1, 1, 1, 1], []])
-		main5.shift(IN)
+        mainWindow = CodeWindow(mainPreReturn)
+        addWindow = CodeWindow(addFinal)
 
-		add1 = addGen1.generate([[], [0], [], []])
-		add2 = addGen1.generate([[], [1], [], []])
+        # BEGIN ANIMATIONS
+        self.play(Write(mainWindow))
+        self.move_camera(phi=60*DEGREES, theta=-135*DEGREES, focal_distance=40)
 
+        # create add code frame
+        self.play(mainWindow.animate.shift(IN))
+        mainPostReturn.shift(IN)
 
-		mainSF = CodeWindow(main1)
+        # hide the called function in the function call
 
-		addSF = CodeWindow(add1)
+        self.play(FadeOut(addWindow.window), run_time = 0)
+        self.add(addWindow.window)
 
-		## ANIMATIONS
-		self.play(Write(mainSF))
-		marker1 = CodeMarker(main1, 0)
-		marker2 = CodeMarker(main1, 4)
-		marker3 = CodeMarker(main2, 4)
-		
-		self.play(Write(marker1))
+        self.play(Transform(addPreCall, mainPreReturn.submobjects[2].submobjects[4]), run_time=0)
+        self.add(addPreCall)
+        self.play(FadeIn(addWindow.window), Transform(addPreCall, addFinal))
 
-		marker1.transform_marker(self, marker2)
-
-		self.play(
-			*mainSF.unwrite_words(3, [1]), 
-			*mainSF.unwrite_words(4, [1]) 
-		)
-		self.play(Transform(main1, main2), Transform(marker1, marker3))
-
-		self.play(Transform(main1, main3))
-
-		self.play(Unwrite(marker1))
-
-		self.move_camera(phi=60*DEGREES, theta=-135*DEGREES, focal_distance=40)
-
-		self.play(Transform(main1, main4))
-		self.play(mainSF.animate.shift(IN))
-		self.play(Write(addSF))
-		self.wait(1)
-		self.play(Transform(add1, add2))
-		self.wait(2)
-
-		# unwrite window and transform paragraph
-		self.play(Unwrite(addSF.window), Transform(addSF.paragraph, mainSF.paragraph.submobjects[5].submobjects[4]))
-		self.remove(addSF.paragraph)
-		self.remove(addSF)
-
-		self.play(*mainSF.unwrite_words(5, [4,5,6,7,9]))
-
-		self.play(Transform(main1, main5))
-		self.play(mainSF.animate.shift(OUT))
-
-		self.move_camera(phi=0*DEGREES, theta=-90*DEGREES, focal_distance=40)
-
-		
-
+        # wait a bit
+        self.wait(1)
+        # pop the frame
+        self.play(Unwrite(addWindow.window), Transform(addPreCall, mainPreReturn.submobjects[2].submobjects[4]))
+        self.remove(addPreCall)
+        
+        # transform return value
+        self.play(*mainWindow.unwrite_words(2, [5,6,7,8,9]))
+        self.play(Transform(mainPreReturn, mainPostReturn))
+        self.play(mainWindow.animate.shift(OUT))
+        
+        self.move_camera(phi=0*DEGREES, theta=-90*DEGREES, focal_distance=40)
