@@ -4,43 +4,66 @@ from StackVisualiser.CodeFrame import *
 class TestCode(ThreeDScene):
     def construct(self):
 
-        # DATA
-        mainGen = CodeBlock.from_list([
+        ###################################################################################
+        ####### SETTING THE VALUES OF THE CODEBLOCK
+        mainList = [
             ['int ', 'x ', '= ', '6', ';'],
             ['int ', 'y ', '= ', '9', ';'],
             ['std', '::', 'cout ', '<< ', ('swap', '420'), ('(', ''), ('x', ''), (', ', ''), ('y', ''), (')', ''), ';'],
             ['std', '::', 'cout ', '<< ', 'x ', '<< ', 'y', ';']
-        ])
+        ]
+        mainVar1Nums = [[], [], [0, 0, 0, 0, 0, 0], []]
+        mainVar2Nums = [[], [], [1, 1, 1, 1, 1, 1], []]
         mainInst1Var1Cols = [
             [KWD, VAR, OPER, NUM, VAR],
             [KWD, VAR, OPER, NUM, VAR],
             [CLS, OPER, VAR, OPER, FUNC, BRA, VAR, OPER, VAR, BRA, VAR],
             [CLS, OPER, VAR, OPER, VAR, OPER, VAR, VAR]
         ]
-
         mainInst1Var2Cols = [
             [KWD, VAR, OPER, NUM, VAR],
             [KWD, VAR, OPER, NUM, VAR],
             [CLS, OPER, VAR, OPER, NUM, BRA, VAR, OPER, VAR, BRA, VAR],
             [CLS, OPER, VAR, OPER, VAR, OPER, VAR, VAR]
         ]
+        mainGen = CodeBlock.from_list(mainList)
+        ###################################################################################
         
-        # ENTITIES
-        mainInst1Var1Para = mainGen.apply_color(mainInst1Var1Cols).generate([[], [], [0, 0, 0, 0, 0, 0], []])
-        mainInst1Var2Para = mainGen.apply_color(mainInst1Var2Cols).generate([[], [], [1, 1, 1, 1, 1, 1], []])
-        mainInst1Window = CodeWindow([mainInst1Var1Para, mainInst1Var2Para], None)
+        #############################################################################
+        #### THING HERE TO PREVENT BUGS IDK HOW TO FIX
+        _base = CodeBlock.from_list(mainList).generate(mainVar1Nums)
+        _base_window = CodeWindow([_base], 0)
+        _base_window.AlignCodeTopLeft()
+        #############################################################################
+        
+        # MY ACTUAL ENTITIES
+        mainInst1Var1Para = mainGen.apply_color(mainInst1Var1Cols).generate(mainVar1Nums)
+        mainInst1Var2Para = mainGen.apply_color(mainInst1Var2Cols).generate(mainVar2Nums)
+        mainInst1Window = CodeWindow([mainInst1Var1Para, mainInst1Var2Para], _base_window)
 
-        mainInst2Var1Para = mainGen.apply_color(mainInst1Var1Cols).generate([[], [], [0, 0, 0, 0, 0, 0], []])
-        mainInst2Var2Para = mainGen.apply_color(mainInst1Var2Cols).generate([[], [], [1, 1, 1, 1, 1, 1], []])
+        mainInst2Var1Para = mainGen.apply_color(mainInst1Var1Cols).generate(mainVar1Nums)
+        mainInst2Var2Para = mainGen.apply_color(mainInst1Var2Cols).generate(mainVar2Nums)
         mainInst2Window = CodeWindow([mainInst2Var1Para, mainInst2Var2Para], mainInst1Window)
 
+
         # BEGIN ANIMATIONS
-        self.play(Write(mainInst1Window))
+
+        # PREPARE TO PUSH MAIN
+        
+
+        mainInst1Window.AlignCodeTopLeft()
+        self.play(mainInst1Window.PushCodeFrame())
+
         self.move_camera(phi=60*DEGREES, theta=-135*DEGREES, focal_distance=40)
 
-        self.play(mainInst1Window.animate.shift(IN))
-        self.play(mainInst2Window.PrepareForPushCodeFrame(2, 4), run_time = 0)
+        self.play(mainInst1Window.ShiftIn())
+        
         self.play(mainInst2Window.PushCodeFrame())
+
+        self.wait(1)
+
+        self.play(mainInst2Window.UnwriteWords(2, [5,6,7,8,9]))
+        self.play(mainInst2Window.NextVariant())
 
         self.play(mainInst2Window.PopCodeFrame(2, 4))
 

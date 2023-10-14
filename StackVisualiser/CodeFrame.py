@@ -1,17 +1,26 @@
 from manim import *
 from typing import List, Union, Tuple
 
+#
+CANVAS_WIDTH : int = 14
+CANVAS_HEIGHT : int = 8
+
 # FONTS
 CODE_FONT : str = "Monospace"
 CODE_FONT_SIZE : int = 16
 CODE_LINE_SPACE : float = 1
 CODE_LINE_HEIGHT : float = 0.7
 
+# CODE MARKERj
 CODE_MARKER_PAD: float = 0.3
 
-# Sizes
+# WINDOW SIZE
 CODEWINDOW_WIDTH : int = 6
 CODEWINDOW_HEIGHT : int = 7
+
+CODEPAD_LEFT : int = 0.5
+CODEPAD_TOP : int = 0.5
+STACK_SPACING : int = 1
 
 # COLORS
 CODE_WINDOW_BG_FILL_COLOR : str = "#1e1e2e"
@@ -215,17 +224,11 @@ class CodeBlock:
 
 class CodeWindow(VGroup):
     
-    allInstances = []
-    
     def __init__(self, variants : List[Paragraph], caller):
         # The paragraph
         self.variants = variants
-        self.activeParagraph = variants[0]
-        self.caller = caller
-        self.currentVariant = 0
+        self.activeParagraph = self.variants[0]
 
-        # TODO: make variants move with the window
-        
         # THE WINDOW
         self.window = RoundedRectangle(
             width=CODEWINDOW_WIDTH,  
@@ -234,14 +237,52 @@ class CodeWindow(VGroup):
             fill_opacity=CODE_WINDOW_BG_FILL_OPACITY
         )
 
+        self.caller = caller
+        self.currentVariant = 0
+
         # FINALLY ADDING EVERYTHING TOGETHER
         super().__init__(self.window, self.activeParagraph)
-        CodeWindow.allInstances.append(self)
         
-    ### Helper functions ################################################################
+            
+    ### ENTITY SETUP FUNCTIONS ################################################################
+
+    def AlignCodeTopLeft(self):
+        # TODO: make variants move with the window
+        def align_with_window(paragraph : Paragraph):
+            paragraph.move_to(self.window.get_center())
+            paragraph.shift(LEFT * CODEWINDOW_WIDTH / 2 + UP * CODEWINDOW_HEIGHT / 2)
+            paragraph.shift(RIGHT * paragraph.get_width() / 2 + DOWN * paragraph.get_height() / 2)
+            paragraph.shift(RIGHT * CODEPAD_LEFT + DOWN * CODEPAD_TOP)
+            
+        for paragraph in self.variants:
+            align_with_window(paragraph)
+            paragraph.add_updater(align_with_window)
 
     ### ANIMATION METHODS & INTERFACE ###################################################
     
+    # use scene.play
+    # WARNING: UNWRITE ALL WORDS THAT SIMPLY DISAPPEAR
+    def NextVariant(self):
+        self.currentVariant += 1
+        return AnimationGroup(
+            Transform(self.activeParagraph, self.variants[self.currentVariant])
+        )
+        
+    def ShiftIn(self):
+        return AnimationGroup(self.animate.shift(IN * STACK_SPACING))
+    
+    @staticmethod
+    def ShiftInMany(windows):
+        return AnimationGroup(*[x.ShiftIn() for x in windows])
+        
+    # WARNING: move everything else downwards before manually
+    def PushCodeFrame(self):
+        self.AlignCodeTopLeft()
+        return Succession(
+            Write(self.window),
+            Write(self.activeParagraph)
+        )
+        
     # use scene.play
     def UnwriteWords(self, line_number : int, word_numbers : List[int]):
         return AnimationGroup(*[Unwrite(self.activeParagraph.submobjects[line_number].submobjects[i]) for i in word_numbers])
@@ -257,23 +298,3 @@ class CodeWindow(VGroup):
                 )
             )
         )
-    
-    # use scene.play
-    # WARNING: UNWRITE ALL WORDS THAT SIMPLY DISAPPEAR
-    def NextVariant(self):
-        self.currentVariant += 1
-        return AnimationGroup(
-            ReplacementTransform(self.activeParagraph, self.variants[self.currentVariant])
-        )
-
-    # WARNING: MAKE THIS ANIMATION TAKE ZERO TIME
-    def PrepareForPushCodeFrame(self, line_number : int, word_number : int):
-        prePara = Paragraph("uwu")
-        self.activeParagraph = prePara
-        # FRAGILE CODE MUCH?
-        self.submobjects[1] = prePara
-        return Transform(self.activeParagraph, self.caller.activeParagraph.submobjects[line_number].submobjects[word_number])
-    
-    # WARNING: move everything else downwards before manually
-    def PushCodeFrame(self):
-        return AnimationGroup(FadeIn(self.window), ReplacementTransform(self.activeParagraph, self.variants[0]))
