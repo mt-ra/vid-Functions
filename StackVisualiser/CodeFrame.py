@@ -18,8 +18,9 @@ CODE_MARKER_PAD: float = 0.3
 CODEWINDOW_WIDTH : int = 6
 CODEWINDOW_HEIGHT : int = 7
 
-CODEPAD_LEFT : int = 0.5
-CODEPAD_TOP : int = 0.5
+CODEPAD_LEFT : int = 0
+CODEPAD_TOP : int = 0
+
 STACK_SPACING : int = 1
 
 # COLORS
@@ -247,41 +248,66 @@ class CodeWindow(VGroup):
     ### ENTITY SETUP FUNCTIONS ################################################################
 
     def AlignCodeTopLeft(self):
+        # HOW DO YOU ALIGN TEXT TO THE LEFT IN MANIM
+        # THIS IS FRAGILE CODE, ONLY WORKS FOR THE CURRENT TEXT SIZE
+        def paraHeight(paragraph):
+            numLines = len(paragraph.submobjects)
+            # THIS IS AN APPROXIMATION
+            return numLines * 0.32 # magic number idek
+        
+        def paraWidth(paragraph):
+            return 0
+        
         # TODO: make variants move with the window
         def align_with_window(paragraph : Paragraph):
-            paragraph.move_to(self.window.get_center())
-            paragraph.shift(LEFT * CODEWINDOW_WIDTH / 2 + UP * CODEWINDOW_HEIGHT / 2)
-            paragraph.shift(RIGHT * paragraph.get_width() / 2 + DOWN * paragraph.get_height() / 2)
-            paragraph.shift(RIGHT * CODEPAD_LEFT + DOWN * CODEPAD_TOP)
+            windowTopLeft = self.window.get_center()
+            windowShift = LEFT * (CODEWINDOW_WIDTH / 2) + UP * (CODEWINDOW_HEIGHT / 2)
+            selfShift = 0#RIGHT * (paragraph.get_width() / 2) + DOWN * (paragraph.get_height()/ 2)
+            paddingShift = RIGHT * (CODEPAD_LEFT) + DOWN * (CODEPAD_TOP)
+            paragraph.move_to(windowTopLeft + windowShift + selfShift + paddingShift)
             
         for paragraph in self.variants:
-            align_with_window(paragraph)
             paragraph.add_updater(align_with_window)
 
+    # shifts it to the left so that it takes up the left half
+    def PositionLeft(self):
+        self.shift(LEFT * CODEWINDOW_WIDTH / 2)
+
     ### ANIMATION METHODS & INTERFACE ###################################################
-    
     # use scene.play
-    # WARNING: UNWRITE ALL WORDS THAT SIMPLY DISAPPEAR
     def NextVariant(self):
         self.currentVariant += 1
         return AnimationGroup(
             Transform(self.activeParagraph, self.variants[self.currentVariant])
         )
         
+    # use scene.play
     def ShiftIn(self):
         return AnimationGroup(self.animate.shift(IN * STACK_SPACING))
     
+    # use scene.play
     @staticmethod
     def ShiftInMany(windows):
         return AnimationGroup(*[x.ShiftIn() for x in windows])
-        
+
+    # use scene.play
+    def ShiftOut(self):
+        return AnimationGroup(self.animate.shift(OUT * STACK_SPACING))
+    
+    # use scene.play
+    @staticmethod
+    def ShiftOutMany(windows):
+        return AnimationGroup(*[x.ShiftOut() for x in windows])
+
+    # use scene.play
     # WARNING: move everything else downwards before manually
     def PushCodeFrame(self):
         self.AlignCodeTopLeft()
-        return Succession(
-            Write(self.window),
-            Write(self.activeParagraph)
-        )
+        # return Succession(
+        #     Write(self.window),
+        #     Write(self.activeParagraph)
+        # )
+        return Write(self)
         
     # use scene.play
     def UnwriteWords(self, line_number : int, word_numbers : List[int]):
